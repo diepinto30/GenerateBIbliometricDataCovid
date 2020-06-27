@@ -20,26 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="267fa862-361d-4db2-b7e5-9db45855e8ab" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GenerateBIbliometricDataCovid.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/BiblioDataGenerate.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/BiblioData-SinTitle.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/BiblioData-SinTitle.xlsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/BiblioData.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/BiblioData.xlsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/Libro2.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/Libro2.xlsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/Libro4.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/RDF/BiblioDataAuthors.rdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/datos-2.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/datos.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/datosFin.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BiblioDataGenerate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BiblioDataGenerate.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +52,12 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
   </component>
   <component name="RunManager">
     <configuration name="BiblioDataGenerate" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -95,7 +83,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1593193552023</updated>
-      <workItem from="1593193555275" duration="257000" />
+      <workItem from="1593193555275" duration="2282000" />
     </task>
     <servers />
   </component>
@@ -117,21 +105,21 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1398" height="231" key="GridCell.Tab.0.bottom" timestamp="1593193806287">
+    <state width="1398" height="231" key="GridCell.Tab.0.bottom" timestamp="1593211197478">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="231" key="GridCell.Tab.0.bottom/0.23.1440.877@0.23.1440.877" timestamp="1593193806287" />
-    <state width="1398" height="231" key="GridCell.Tab.0.center" timestamp="1593193806286">
+    <state width="1398" height="231" key="GridCell.Tab.0.bottom/0.23.1440.877@0.23.1440.877" timestamp="1593211197478" />
+    <state width="1398" height="231" key="GridCell.Tab.0.center" timestamp="1593211197477">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="231" key="GridCell.Tab.0.center/0.23.1440.877@0.23.1440.877" timestamp="1593193806286" />
-    <state width="1398" height="231" key="GridCell.Tab.0.left" timestamp="1593193806285">
+    <state width="1398" height="231" key="GridCell.Tab.0.center/0.23.1440.877@0.23.1440.877" timestamp="1593211197477" />
+    <state width="1398" height="231" key="GridCell.Tab.0.left" timestamp="1593211197477">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="231" key="GridCell.Tab.0.left/0.23.1440.877@0.23.1440.877" timestamp="1593193806285" />
-    <state width="1398" height="231" key="GridCell.Tab.0.right" timestamp="1593193806286">
+    <state width="1398" height="231" key="GridCell.Tab.0.left/0.23.1440.877@0.23.1440.877" timestamp="1593211197477" />
+    <state width="1398" height="231" key="GridCell.Tab.0.right" timestamp="1593211197478">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state width="1398" height="231" key="GridCell.Tab.0.right/0.23.1440.877@0.23.1440.877" timestamp="1593193806286" />
+    <state width="1398" height="231" key="GridCell.Tab.0.right/0.23.1440.877@0.23.1440.877" timestamp="1593211197478" />
   </component>
 </project>

@@ -2,29 +2,53 @@ import org.apache.jena.rdf.model.*;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
-        import java.io.*;
+import java.io.*;
 
 public class BiblioDataGenerate {
     public static final String SEPARADOR = ",";
     public static String[][] atributos = new String[3000][28];
     public static int limite = 0;
 
+    public static String[] tipos_Fabio = {"Article", "Erratum","Review","ConferencePaper", "Letter", "Editorial"};
+
     public static void main(String[] args) throws FileNotFoundException {
+
+
 
         leerDatos();
 
         Model model = ModelFactory.createDefaultModel();
-        File f = new File("src/main/resources/RDF/BiblioDataAuthors.rdf"); //definición del fichero donde insertaremos los datos RDF
+
+        //definición del fichero donde insertaremos los datos RDF
+        File f = new File("src/main/resources/RDF/BiblioDataAuthors.rdf");
         FileOutputStream os = new FileOutputStream(f);
 
         //Set prefix for the URI base (new data)
-        String dataPrefix = "http://example.org/data/";
+        String dataPrefix = "http://utpl.edu.ec/COVIDBiblio/ontology/";
         model.setNsPrefix("myData", dataPrefix);
+
+        Model myOntoModel = ModelFactory.createDefaultModel();
 
         String dbo = "http://dbpedia.org/ontology/";
         model.setNsPrefix("dbo", dbo);
         Model dboModel = ModelFactory.createDefaultModel();
+
+
+        String fabio = "http://purl.org/spar/fabio/";
+        model.setNsPrefix("fabio", fabio);
+        Model fabioModel = ModelFactory.createDefaultModel();
+
+
+        String dcat = "https://www.w3.org/TR/vocab-dcat-2/";
+        model.setNsPrefix("dcat", dcat);
+        Model dcatModel = ModelFactory.createDefaultModel();
+
+        String prov = "https://www.w3.org/ns/prov";
+        model.setNsPrefix("prov", prov);
+        Model provModel = ModelFactory.createDefaultModel();
+
 
 
         for (int i = 1; i < limite; i++) {
@@ -42,6 +66,9 @@ public class BiblioDataGenerate {
 
             String URI_DOCUMENTO = dataPrefix + eid_documento;
 
+
+
+
             String anio = atributos[i][5];
             String source_title = atributos[i][6];
             String vol = atributos[i][7];
@@ -52,69 +79,75 @@ public class BiblioDataGenerate {
             String document_type = atributos[i][15];
             String stage = atributos[i][16];
             String access = atributos[i][17];
+
+
             String fuente = atributos[i][18];
+            //URI DE LA FUENTE
+            String URI_FUENTE = dataPrefix + fuente.replace(" ","");
+
             String language = atributos[i][19];
             String publisher = atributos[i][21];
             String issn = atributos[i][22];
             String affiliation = atributos[i][23];
             String pais = atributos[i][24];
 
-            //System.out.println(atributos[i][0]);
 
 
+            // CREACION DE SCIENTIFIC DATABASE
+            Resource fuenteDocumento = model.createResource(URI_FUENTE)
+                    .addProperty(FOAF.name, fuente)
+                    .addProperty(RDFS.subClassOf, FOAF.Organization);
+
+            //CREACION DEL DATASET
+            String URIDataset = dataPrefix + "BiblioDataCovid/";
+            Resource datasetInfo = model.createResource(URIDataset)
+                    .addProperty(RDF.type, dcatModel.getResource(dcat + "Dataset/")
+                            .addProperty(DCTerms.title, "BiblioDataCovid")
+                            .addProperty(dcatModel.getProperty(dcat + "keyword/"),("covid19; sars-cov-2"))
+                            .addProperty(DCTerms.modified, "10-06-2020"));
+
+            //CREACION DEL CATALOG
+            String URICatalog = dataPrefix+"CatalogScopusCOVID/";
+            Resource catalog = model.createResource(URICatalog)
+                    .addProperty(DCTerms.title, "CatalogScopusCOVID")
+                    .addProperty(RDF.type, dcatModel.getResource(dcat + "Catalog/")
+                            .addProperty(DCTerms.publisher, fuenteDocumento)
+                            .addProperty(dcatModel.getProperty(dcat +"dataset"), datasetInfo ));
+
+            // CREACION DE DOCUMENTO BIBLIOGRAFICO
             Resource documento = model.createResource(URI_DOCUMENTO)
-                    .addProperty(DCTerms.title, titulo);
+                    .addProperty(DCTerms.title, titulo)
+                    .addProperty(DCTerms.date, anio)
+                    .addProperty(myOntoModel.getProperty(dataPrefix +"citationsCount"), num_citas)
+                    .addProperty(DCTerms.language, dboModel.getResource(dbo+language))
+                    .addProperty(RDFS.subClassOf, fabioModel.getResource(fabio+ "ScholaryWork/")
+                            .addProperty(provModel.getProperty(prov + "wasDerivedFrom"), datasetInfo));
+            // Se crea el tipo de documento
+            // Se compara el tipo con los de fabio y si es igual toma la uri de fabio
+            for (String nombre : tipos_Fabio) {
+                if(document_type.replace(" ","").equals(nombre)){
+                    documento.addProperty(RDF.type, fabioModel.getResource(fabio + document_type.replace(" ","")));
+                }else{
+                    documento.addProperty(RDF.type, myOntoModel.getResource(dataPrefix + document_type.replace(" ","")));
+                }
+            }
+
 
             for (int j = 0; j < parts_id_autores.length; j++) {
                 // CREANDO INSTANCIAS DE LOS AUTORES
                 int long_parts_nombres = parts_nombres.length;
-                String URI_AUTOR = dataPrefix + parts_id_autores[j];
+                String URI_AUTOR = dataPrefix+ "Author/" + parts_id_autores[j];
                 Resource autor = model.createResource(URI_AUTOR)
-                        .addProperty(RDF.type, FOAF.Person);
+                        .addProperty(RDF.type, myOntoModel.getResource(dataPrefix+"Author"))
+                        .addProperty(RDFS.subClassOf, FOAF.Person);
                 if (j<long_parts_nombres) {
                     autor.addProperty(FOAF.name, parts_nombres[j]);
                 }
-
-
 
                 // Vinculando el autor al documento
                 documento.addProperty(DCTerms.creator, autor);
 
             }
-
-            /*
-            // create people 2 and add the properties cascading style
-            String personURI = dataPrefix + atributos[i][0];
-            String name = atributos[i][1];
-            String lastname = atributos[i][2];
-            String country = atributos[i][3];
-            String country_cod = atributos[i][4];
-            String email = atributos[i][5];
-            String id_father = atributos[i][6];
-            String id_mother = atributos[i][7];
-            String Ocupation = atributos[i][8];
-
-            //Resource country_resource = model.createResource(country);
-            Resource personFunction = model.createResource(dataPrefix + Ocupation)
-                    .addProperty(RDF.type, dboModel.getResource(dbo + "PersonFunction"))
-                    .addProperty(RDFS.label, Ocupation);
-
-            Resource person = model.createResource(personURI)
-                    .addProperty(RDF.type, FOAF.Person)
-                    .addProperty(FOAF.name, name)
-                    .addProperty(FOAF.lastName, lastname)
-                    .addProperty(dboModel.getProperty(dbo + "occupation"), personFunction);
-
-            if(!(country.equals(""))){
-                person.addProperty(dboModel.getProperty(dbo + "country"), dboModel.getResource(dbo + country));
-            }
-            if(!(id_father.equals(""))){
-                person.addProperty(dboModel.getProperty(dbo + "father"), id_father);
-            }
-            if(!(id_mother.equals(""))){
-                person.addProperty(dboModel.getProperty(dbo + "mother"), id_mother);
-            }
-             */
         }
 
         StmtIterator iter = model.listStatements();
@@ -176,4 +209,5 @@ public class BiblioDataGenerate {
         }
 
     }
+
 }
