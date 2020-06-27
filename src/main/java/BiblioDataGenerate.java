@@ -35,6 +35,10 @@ public class BiblioDataGenerate {
         model.setNsPrefix("dbo", dbo);
         Model dboModel = ModelFactory.createDefaultModel();
 
+        String dbr = "http://dbpedia.org/resource/";
+        model.setNsPrefix("dbr", dbr);
+        Model dbrModel = ModelFactory.createDefaultModel();
+
 
         String fabio = "http://purl.org/spar/fabio/";
         model.setNsPrefix("fabio", fabio);
@@ -119,7 +123,7 @@ public class BiblioDataGenerate {
                     .addProperty(DCTerms.title, titulo)
                     .addProperty(DCTerms.date, anio)
                     .addProperty(myOntoModel.getProperty(dataPrefix +"citationsCount"), num_citas)
-                    .addProperty(DCTerms.language, dboModel.getResource(dbo+language))
+                    .addProperty(DCTerms.language, dboModel.getResource(dbr+language))
                     .addProperty(RDFS.subClassOf, fabioModel.getResource(fabio+ "ScholaryWork/")
                             .addProperty(provModel.getProperty(prov + "wasDerivedFrom"), datasetInfo));
             // Se crea el tipo de documento
