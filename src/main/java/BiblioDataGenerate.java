@@ -39,11 +39,9 @@ public class BiblioDataGenerate {
         model.setNsPrefix("dbr", dbr);
         Model dbrModel = ModelFactory.createDefaultModel();
 
-
         String fabio = "http://purl.org/spar/fabio/";
         model.setNsPrefix("fabio", fabio);
         Model fabioModel = ModelFactory.createDefaultModel();
-
 
         String dcat = "https://www.w3.org/TR/vocab-dcat-2/";
         model.setNsPrefix("dcat", dcat);
@@ -52,9 +50,7 @@ public class BiblioDataGenerate {
         String prov = "https://www.w3.org/ns/prov";
         model.setNsPrefix("prov", prov);
         Model provModel = ModelFactory.createDefaultModel();
-
-
-
+        
         for (int i = 1; i < limite; i++) {
 
             // AUTORES
