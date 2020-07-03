@@ -88,6 +88,8 @@ public class BiblioDataGenerate {
             String fuente = atributos[i][18];
             //URI DE LA FUENTE
             String URI_FUENTE = dataPrefix + "ScientificDatabase/" + fuente.replace(" ","");
+            String URI_DATASET = dataPrefix + "Dataset/BiblioDataCovid/";
+            String URI_CATALOG = dataPrefix + "Catalog/CatalogScopusCOVID/";
 
             String language = atributos[i][19];
             String publisher = atributos[i][21];
@@ -103,16 +105,16 @@ public class BiblioDataGenerate {
                     .addProperty(RDFS.subClassOf, FOAF.Organization);
 
             //CREACION DEL DATASET
-            String URIDataset = dataPrefix + "Dataset/BiblioDataCovid/";
-            Resource datasetInfo = model.createResource(URIDataset)
+            //String URIDataset = dataPrefix + "Dataset/BiblioDataCovid/";
+            Resource datasetInfo = model.createResource(URI_DATASET)
                     .addProperty(RDF.type, dcatModel.getResource(dcat + "Dataset/")
                             .addProperty(DCTerms.title, "BiblioDataCovid")
                             .addProperty(dcatModel.getProperty(dcat + "keyword/"),("covid19; sars-cov-2"))
                             .addProperty(DCTerms.modified, "10-06-2020"));
 
             //CREACION DEL CATALOG
-            String URICatalog = dataPrefix+"Catalog/CatalogScopusCOVID/";
-            Resource catalog = model.createResource(URICatalog)
+            //String URICatalog = dataPrefix+"Catalog/CatalogScopusCOVID/";
+            Resource catalog = model.createResource(URI_CATALOG)
                     .addProperty(DCTerms.title, "CatalogScopusCOVID")
                     .addProperty(RDF.type, dcatModel.getResource(dcat + "Catalog/")
                             .addProperty(DCTerms.publisher, fuenteDocumento)
@@ -171,10 +173,8 @@ public class BiblioDataGenerate {
                 // object is a literal
                 System.out.print(" \"" + object.toString() + "\"");
             }
-
             System.out.println(" .");
         }
-
         // Save to a file
         RDFWriter writer = model.getWriter("RDF/XML"); //RDF/XML
         writer.write(model, os, dataPrefix);
