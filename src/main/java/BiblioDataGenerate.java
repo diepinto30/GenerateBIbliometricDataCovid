@@ -21,14 +21,13 @@ public class BiblioDataGenerate {
 
         Model model = ModelFactory.createDefaultModel();
 
-        //definición del fichero donde insertaremos los datos RDF
+        //definicion del fichero donde insertaremos los datos RDF
         File f = new File("src/main/resources/RDF/BiblioDataAuthors.rdf");
         FileOutputStream os = new FileOutputStream(f);
 
         //Set prefix for the URI base (new data)
         String dataPrefix = "http://utpl.edu.ec/COVIDBiblio/ontology/";
         model.setNsPrefix("myData", dataPrefix);
-
         Model myOntoModel = ModelFactory.createDefaultModel();
 
         String dbo = "http://dbpedia.org/ontology/";
@@ -51,8 +50,17 @@ public class BiblioDataGenerate {
         model.setNsPrefix("prov", prov);
         Model provModel = ModelFactory.createDefaultModel();
         
+        
+        String prism = "http://prismstandard.org/namespaces/basic/2.0/>";
+        model.setNsPrefix("prism", prism);
+        Model prismModel = ModelFactory.createDefaultModel();
+        
+        
+        
+        
+      
+        
         for (int i = 1; i < limite; i++) {
-
             // AUTORES
             String nombres = atributos[i][1];
             String[] parts_nombres = nombres.split(";");
@@ -60,15 +68,11 @@ public class BiblioDataGenerate {
             String[] parts_id_autores = id_autores.split(";");
 
             // DOCUMENTOS
-
             String titulo = atributos[i][3];
             String eid_documento = atributos[i][4];
 
-            String URI_DOCUMENTO = dataPrefix + eid_documento;
-
-
-
-
+            // URI DEL DOCUMENTO
+            String URI_DOCUMENTO = dataPrefix + "BibliographicResource/" +  eid_documento;
             String anio = atributos[i][5];
             String source_title = atributos[i][6];
             String vol = atributos[i][7];
@@ -79,11 +83,11 @@ public class BiblioDataGenerate {
             String document_type = atributos[i][15];
             String stage = atributos[i][16];
             String access = atributos[i][17];
-
-
+            
+            // Nombre de la fuente
             String fuente = atributos[i][18];
             //URI DE LA FUENTE
-            String URI_FUENTE = dataPrefix + fuente.replace(" ","");
+            String URI_FUENTE = dataPrefix + "ScientificDatabase/" + fuente.replace(" ","");
 
             String language = atributos[i][19];
             String publisher = atributos[i][21];
@@ -99,7 +103,7 @@ public class BiblioDataGenerate {
                     .addProperty(RDFS.subClassOf, FOAF.Organization);
 
             //CREACION DEL DATASET
-            String URIDataset = dataPrefix + "BiblioDataCovid/";
+            String URIDataset = dataPrefix + "Dataset/BiblioDataCovid/";
             Resource datasetInfo = model.createResource(URIDataset)
                     .addProperty(RDF.type, dcatModel.getResource(dcat + "Dataset/")
                             .addProperty(DCTerms.title, "BiblioDataCovid")
@@ -107,7 +111,7 @@ public class BiblioDataGenerate {
                             .addProperty(DCTerms.modified, "10-06-2020"));
 
             //CREACION DEL CATALOG
-            String URICatalog = dataPrefix+"CatalogScopusCOVID/";
+            String URICatalog = dataPrefix+"Catalog/CatalogScopusCOVID/";
             Resource catalog = model.createResource(URICatalog)
                     .addProperty(DCTerms.title, "CatalogScopusCOVID")
                     .addProperty(RDF.type, dcatModel.getResource(dcat + "Catalog/")
@@ -121,7 +125,9 @@ public class BiblioDataGenerate {
                     .addProperty(myOntoModel.getProperty(dataPrefix +"citationsCount"), num_citas)
                     .addProperty(DCTerms.language, dboModel.getResource(dbr+language))
                     .addProperty(RDFS.subClassOf, fabioModel.getResource(fabio+ "ScholaryWork/")
-                            .addProperty(provModel.getProperty(prov + "wasDerivedFrom"), datasetInfo));
+                    .addProperty(prismModel.getProperty(prism +"doi/"), doi)
+                    .addProperty(prismModel.getProperty(prism +"volume/"), vol)
+                    .addProperty(provModel.getProperty(prov + "wasDerivedFrom"), datasetInfo));
             // Se crea el tipo de documento
             // Se compara el tipo con los de fabio y si es igual toma la uri de fabio
             for (String nombre : tipos_Fabio) {
@@ -143,7 +149,6 @@ public class BiblioDataGenerate {
                 if (j<long_parts_nombres) {
                     autor.addProperty(FOAF.name, parts_nombres[j]);
                 }
-
                 // Vinculando el autor al documento
                 documento.addProperty(DCTerms.creator, autor);
 
