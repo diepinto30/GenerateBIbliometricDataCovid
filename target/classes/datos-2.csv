@@ -1,7 +1,0 @@
-Id,Name,Lastname,Country,countryCode,email,idFather,idMother,Occupation
-1093491395,Luís Alfredo, Gutiérrez,Ecuador,EC,lagutierrez@utpl.edu.ec,,99234234N,EstudiantePresencial
-0998123456,Ana Rosa, Salas Castro,Ecuador,EC,arsalas@utpl.edu.ec,1101457364,948759800,EstudianteDistancia
-99234234N,Esterfilia, Gutiérrez Meza,Colombia,CO,,91989823F,8128149G,Amadecasa
-1101457364,Mauricio, Salas Delgado,Ecuador,EC,,1100233545,1100734135,Profesor
-8128149G,María Graciela, Vásquez,Venezuela,VN,mgvasquezl@gmail.com,,,Doctora
-0948759800,Rosa Angélica, Castro,Ecuador,EC,,0922458782,1792439595,Contadora

@@ -1,3 +1,4 @@
+
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.DCTerms;
@@ -5,19 +6,25 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import modelos.Source;
 
 public class BiblioDataGenerate {
+
     public static final String SEPARADOR = ",";
     public static String[][] atributos = new String[3000][28];
     public static int limite = 0;
 
-    public static String[] tipos_Fabio = {"Article", "Erratum","Review","ConferencePaper", "Letter", "Editorial"};
+    public static String[][] atributosS = new String[1000000][11];
+    public static int limiteS = 0;
+
+    public static String[] tipos_Fabio = {"Article", "Erratum", "Review", "ConferencePaper", "Letter", "Editorial"};
 
     public static void main(String[] args) throws FileNotFoundException {
 
-
-
         leerDatos();
+        leerDatosSource();
 
         Model model = ModelFactory.createDefaultModel();
 
@@ -46,19 +53,83 @@ public class BiblioDataGenerate {
         model.setNsPrefix("dcat", dcat);
         Model dcatModel = ModelFactory.createDefaultModel();
 
-        String prov = "https://www.w3.org/ns/prov";
+        String prov = "https://www.w3.org/ns/prov/";
         model.setNsPrefix("prov", prov);
         Model provModel = ModelFactory.createDefaultModel();
-        
-        
-        String prism = "http://prismstandard.org/namespaces/basic/2.0/>";
+
+        String prism = "http://prismstandard.org/namespaces/basic/2.0/";
         model.setNsPrefix("prism", prism);
         Model prismModel = ModelFactory.createDefaultModel();
         
         
+        String bido = "http://purl.org/spar/bido/";
+        model.setNsPrefix("bido", bido);
+        Model bidoModel = ModelFactory.createDefaultModel();
         
-        
-      
+
+        for (int k = 1; k < limiteS; k++) {
+            
+            String[] parts_issn = atributosS[k][3].split(";"); // Split del campo issn 
+
+            List<String> categorias = new ArrayList<>();
+            List<String> rank = new ArrayList<>();
+
+            String[] parts_categoriasQuartile = atributosS[k][6].split(";"); // Split del campo categoriasQuatile
+
+            if (parts_categoriasQuartile.length > 1) {
+                for (String categoria : parts_categoriasQuartile) {
+                    String[] categoriaQ = categoria.split("-");
+                    if (categoriaQ.length > 1) {
+                        categorias.add(categoriaQ[0]);
+                        rank.add(categoriaQ[1]);
+                    } else {
+                        categorias.add(categoriaQ[0]);
+                        rank.add("");
+                    }
+                }
+            } else {
+                String[] categoriaQa = parts_categoriasQuartile[0].split("-");
+                if (categoriaQa.length > 1) {
+                    categorias.add(categoriaQa[0]);
+                    rank.add(categoriaQa[1]);
+                } else {
+                    categorias.add(categoriaQa[0]);
+                    rank.add("");
+                }
+            }
+
+            // CREACION DE SOURCES
+            for (int l = 0; l < parts_issn.length; l++) {
+                Source source = new Source(atributosS[k][1], atributosS[k][2], parts_issn[l], atributosS[k][4],
+                        atributosS[k][5], categorias, rank, atributosS[k][7], atributosS[k][8]);
+                String URI_SourceT = dataPrefix+"Source/" + source.getIssn();
+                
+                Resource sourceT = model.createResource(URI_SourceT)
+                    .addProperty(RDF.type, myOntoModel.getResource(dataPrefix + "/SourceT"))
+                    .addProperty(prismModel.getProperty(prism +"issn"), source.getIssn())
+                    .addProperty(DCTerms.identifier, source.getSource_id())
+                    .addProperty(DCTerms.title, source.getTitle())
+                    .addProperty(dboModel.getProperty(dbo+"country"), dbrModel.getResource(dbr +source.getCountry().replace(" ","")))
+                    .addProperty(myOntoModel.getProperty(dataPrefix +"rank"), source.getRank());
+                
+                for(int contC=0; contC<source.getCategorias().size(); contC++){
+                    
+                    Resource quartile = model.createResource(dataPrefix+ source.getIssn()+"_" +source.getCategorias().get(contC).replace(" ",""))
+                            .addProperty(RDF.type, bidoModel.getResource(bido + "Quartile/"))
+                            .addProperty(DCTerms.title, source.getCategorias().get(contC))
+                            .addProperty(myOntoModel.getProperty(dataPrefix + "quartile"), source.getQuartile().get(contC))
+                            .addProperty(RDFS.subClassOf, bidoModel.getResource(bido +"QuartileCategory/"));
+                    
+                    sourceT.addProperty(bidoModel.getProperty(bido +"hasQuartile"), quartile);
+                }
+                
+                
+                
+              
+            }
+
+        }
+
         
         for (int i = 1; i < limite; i++) {
             // AUTORES
@@ -101,6 +172,7 @@ public class BiblioDataGenerate {
 
             // CREACION DE SCIENTIFIC DATABASE
             Resource fuenteDocumento = model.createResource(URI_FUENTE)
+                    .addProperty(RDF.type, myOntoModel.getResource(dataPrefix + "/ScientificDatabase"))
                     .addProperty(FOAF.name, fuente)
                     .addProperty(RDFS.subClassOf, FOAF.Organization);
 
@@ -128,8 +200,10 @@ public class BiblioDataGenerate {
                     .addProperty(DCTerms.language, dboModel.getResource(dbr+language))
                     .addProperty(RDFS.subClassOf, fabioModel.getResource(fabio+ "ScholaryWork/")
                     .addProperty(prismModel.getProperty(prism +"doi/"), doi)
+                    .addProperty(prismModel.getProperty(prism +"issn"), issn)
                     .addProperty(prismModel.getProperty(prism +"volume/"), vol)
-                    .addProperty(provModel.getProperty(prov + "wasDerivedFrom"), datasetInfo));
+                    .addProperty(provModel.getProperty(prov + "wasDerivedFrom"), datasetInfo))
+                    .addProperty(bidoModel.getProperty(bido+ "withBibliometricData"), myOntoModel.getResource(dataPrefix+"Source/"+issn));
             // Se crea el tipo de documento
             // Se compara el tipo con los de fabio y si es igual toma la uri de fabio
             for (String nombre : tipos_Fabio) {
@@ -157,6 +231,7 @@ public class BiblioDataGenerate {
             }
         }
 
+
         StmtIterator iter = model.listStatements();
         // Print the triplets
         while (iter.hasNext()) {
@@ -178,7 +253,6 @@ public class BiblioDataGenerate {
         // Save to a file
         RDFWriter writer = model.getWriter("RDF/XML"); //RDF/XML
         writer.write(model, os, dataPrefix);
-
     }
 
     public static void leerDatos() {
@@ -187,10 +261,8 @@ public class BiblioDataGenerate {
         try {
             // Abrir el .csv en buffer de lectura
             bufferLectura = new BufferedReader(new FileReader("src/main/resources/datosFin.csv"));
-
             // Leer una linea del archivo
             String linea = bufferLectura.readLine();
-
             while (linea != null) {
                 // Sepapar la linea leída con el separador definido previamente
                 String[] campos = linea.split(SEPARADOR);
@@ -199,6 +271,39 @@ public class BiblioDataGenerate {
                 // Volver a leer otra línea del fichero
                 linea = bufferLectura.readLine();
                 limite = limite + 1;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // Cierro el buffer de lectura
+            if (bufferLectura != null) {
+                try {
+                    bufferLectura.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    public static void leerDatosSource() {
+        limiteS = 0;
+        BufferedReader bufferLectura = null;
+        try {
+            // Abrir el .csv en buffer de lectura
+            bufferLectura = new BufferedReader(new FileReader("src/main/resources/source.csv"));
+            // Leer una linea del archivo
+            String linea = bufferLectura.readLine();
+            while (linea != null) {
+                // Sepapar la linea leída con el separador definido previamente
+                String[] campos = linea.split(SEPARADOR);
+
+                atributosS[limiteS] = linea.split(SEPARADOR);
+                // Volver a leer otra línea del fichero
+                linea = bufferLectura.readLine();
+                //System.out.println(linea);
+                limiteS = limiteS + 1;
             }
         } catch (IOException e) {
             e.printStackTrace();
