@@ -105,7 +105,7 @@ public class BiblioDataGenerate {
                 String URI_SourceT = dataPrefix+"Source/" + source.getIssn();
                 
                 Resource sourceT = model.createResource(URI_SourceT)
-                    .addProperty(RDF.type, myOntoModel.getResource(dataPrefix + "/SourceT"))
+                    .addProperty(RDF.type, myOntoModel.getResource(dataPrefix + "SourceT"))
                     .addProperty(prismModel.getProperty(prism +"issn"), source.getIssn())
                     .addProperty(DCTerms.identifier, source.getSource_id())
                     .addProperty(DCTerms.title, source.getTitle())
@@ -115,7 +115,7 @@ public class BiblioDataGenerate {
                 for(int contC=0; contC<source.getCategorias().size(); contC++){
                     
                     Resource quartile = model.createResource(dataPrefix+ source.getIssn()+"_" +source.getCategorias().get(contC).replace(" ",""))
-                            .addProperty(RDF.type, bidoModel.getResource(bido + "Quartile/"))
+                            .addProperty(RDF.type, bidoModel.getResource(bido + "Quartile"))
                             .addProperty(DCTerms.title, source.getCategorias().get(contC))
                             .addProperty(myOntoModel.getProperty(dataPrefix + "quartile"), source.getQuartile().get(contC))
                             .addProperty(RDFS.subClassOf, bidoModel.getResource(bido +"QuartileCategory/"));
