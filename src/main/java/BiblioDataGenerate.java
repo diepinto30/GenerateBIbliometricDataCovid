@@ -20,7 +20,8 @@ public class BiblioDataGenerate {
     public static int limiteS = 0;
 
     public static String[] tipos_Fabio = {"Article", "Erratum", "Review", "ConferencePaper", "Letter", "Editorial"};
-
+    static boolean tipo = false;
+    
     public static void main(String[] args) throws FileNotFoundException {
 
         leerDatos();
@@ -57,9 +58,10 @@ public class BiblioDataGenerate {
         model.setNsPrefix("prov", prov);
         Model provModel = ModelFactory.createDefaultModel();
 
-        String prism = "http://prismstandard.org/namespaces/basic/2.0/";
+        String prism = "http://prismstandard.org/namespaces/1.2/basic/";
         model.setNsPrefix("prism", prism);
         Model prismModel = ModelFactory.createDefaultModel();
+        
         
         
         String bido = "http://purl.org/spar/bido/";
@@ -118,7 +120,7 @@ public class BiblioDataGenerate {
                             .addProperty(RDF.type, bidoModel.getResource(bido + "Quartile"))
                             .addProperty(DCTerms.title, source.getCategorias().get(contC))
                             .addProperty(myOntoModel.getProperty(dataPrefix + "quartile"), source.getQuartile().get(contC))
-                            .addProperty(RDFS.subClassOf, bidoModel.getResource(bido +"QuartileCategory/"));
+                            .addProperty(RDFS.subClassOf, bidoModel.getResource(bido +"QuartileCategory"));
                     
                     sourceT.addProperty(bidoModel.getProperty(bido +"hasQuartile"), quartile);
                 }
@@ -179,16 +181,16 @@ public class BiblioDataGenerate {
             //CREACION DEL DATASET
             //String URIDataset = dataPrefix + "Dataset/BiblioDataCovid/";
             Resource datasetInfo = model.createResource(URI_DATASET)
-                    .addProperty(RDF.type, dcatModel.getResource(dcat + "Dataset/")
+                    .addProperty(RDF.type, dcatModel.getResource(dcat + "Dataset")
                             .addProperty(DCTerms.title, "BiblioDataCovid")
-                            .addProperty(dcatModel.getProperty(dcat + "keyword/"),("covid19; sars-cov-2"))
+                            .addProperty(dcatModel.getProperty(dcat + "keyword"),("covid19; sars-cov-2"))
                             .addProperty(DCTerms.modified, "10-06-2020"));
 
             //CREACION DEL CATALOG
             //String URICatalog = dataPrefix+"Catalog/CatalogScopusCOVID/";
             Resource catalog = model.createResource(URI_CATALOG)
                     .addProperty(DCTerms.title, "CatalogScopusCOVID")
-                    .addProperty(RDF.type, dcatModel.getResource(dcat + "Catalog/")
+                    .addProperty(RDF.type, dcatModel.getResource(dcat + "Catalog")
                             .addProperty(DCTerms.publisher, fuenteDocumento)
                             .addProperty(dcatModel.getProperty(dcat +"dataset"), datasetInfo ));
 
@@ -198,21 +200,28 @@ public class BiblioDataGenerate {
                     .addProperty(DCTerms.date, anio)
                     .addProperty(myOntoModel.getProperty(dataPrefix +"citationsCount"), num_citas)
                     .addProperty(DCTerms.language, dboModel.getResource(dbr+language))
-                    .addProperty(RDFS.subClassOf, fabioModel.getResource(fabio+ "ScholaryWork/")
-                    .addProperty(prismModel.getProperty(prism +"doi/"), doi)
+                    .addProperty(RDFS.subClassOf, fabioModel.getResource(fabio+ "ScholaryWork")
+                    .addProperty(prismModel.getProperty(prism +"doi"), doi)
                     .addProperty(prismModel.getProperty(prism +"issn"), issn)
-                    .addProperty(prismModel.getProperty(prism +"volume/"), vol)
+                    .addProperty(prismModel.getProperty(prism +"volume"), vol)
                     .addProperty(provModel.getProperty(prov + "wasDerivedFrom"), datasetInfo))
                     .addProperty(bidoModel.getProperty(bido+ "withBibliometricData"), myOntoModel.getResource(dataPrefix+"Source/"+issn));
             // Se crea el tipo de documento
             // Se compara el tipo con los de fabio y si es igual toma la uri de fabio
+            tipo = false;
             for (String nombre : tipos_Fabio) {
                 if(document_type.replace(" ","").equals(nombre)){
                     documento.addProperty(RDF.type, fabioModel.getResource(fabio + document_type.replace(" ","")));
-                }else{
-                    documento.addProperty(RDF.type, myOntoModel.getResource(dataPrefix + document_type.replace(" ","")));
+                    tipo = true;
+                    break;
                 }
             }
+            
+            if(!tipo){
+                documento.addProperty(RDF.type, myOntoModel.getResource(dataPrefix + document_type.replace(" ","")));
+            }
+           
+                  
 
 
             for (int j = 0; j < parts_id_autores.length; j++) {
@@ -234,6 +243,7 @@ public class BiblioDataGenerate {
 
         StmtIterator iter = model.listStatements();
         // Print the triplets
+        /*
         while (iter.hasNext()) {
             Statement stmt = iter.nextStatement();  // get next statement
             Resource subject = stmt.getSubject();     // get the subject
@@ -249,7 +259,7 @@ public class BiblioDataGenerate {
                 System.out.print(" \"" + object.toString() + "\"");
             }
             System.out.println(" .");
-        }
+        }*/
         // Save to a file
         RDFWriter writer = model.getWriter("RDF/XML"); //RDF/XML
         writer.write(model, os, dataPrefix);

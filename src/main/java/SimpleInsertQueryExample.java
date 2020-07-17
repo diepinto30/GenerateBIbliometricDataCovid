@@ -35,6 +35,7 @@ public class SimpleInsertQueryExample {
     private static String strInsert;
     private static String strQuery;
     private static String strQuery2;
+    private static String strQuery_Principal;
     
     private static List<String> recursos = new ArrayList<>();
     private static List<String> nombres = new ArrayList<>();
@@ -67,6 +68,19 @@ public class SimpleInsertQueryExample {
                 + "?Recursos dct:title ?titulo ."
                 + "?Recursos rdf:type fabio:Article . "
                 + "}";
+        
+        
+        strQuery_Principal
+		= "PREFIX onto: <http://www.ontotext.com/>"
+                + "PREFIX fabio: <http://purl.org/spar/fabio/>"
+                + "PREFIX dct: <http://purl.org/dc/terms/>"
+                + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
+                + "select DISTINCT ?Recursos ?titulo ?tipo WHERE {"
+                + "?Recursos dct:title ?titulo ."
+                + "?Recursos rdf:type ?tipo .  "
+                + "?Recursos rdfs:subClassOf fabio:ScholaryWork ."
+                + "}";
     }
     
     
@@ -98,7 +112,7 @@ public class SimpleInsertQueryExample {
     private static void query(
             RepositoryConnection repositoryConnection) {
         TupleQuery tupleQuery = repositoryConnection
-                .prepareTupleQuery(QueryLanguage.SPARQL, strQuery2);
+                .prepareTupleQuery(QueryLanguage.SPARQL, strQuery_Principal);
         TupleQueryResult result = null;
         try {
             result = tupleQuery.evaluate();
@@ -106,7 +120,9 @@ public class SimpleInsertQueryExample {
                 BindingSet bindingSet = result.next();
                 SimpleLiteral titulo = (SimpleLiteral) bindingSet.getValue("titulo");
                 SimpleIRI Recursos = (SimpleIRI) bindingSet.getValue("Recursos");
+                SimpleIRI tipo = (SimpleIRI) bindingSet.getValue("tipo");
                 
+                System.out.println(tipo.stringValue());
                 //logger.trace("titulo= " + titulo.stringValue());
                 nombres.add(titulo.stringValue());
                 recursos.add(Recursos.stringValue());
@@ -127,8 +143,7 @@ public class SimpleInsertQueryExample {
             //insert(repositoryConnection);
             query(repositoryConnection);
             
-            System.out.println("El tamaño de los nombres es: " +nombres.size());
-            System.out.println("El tamaño de los recursos es: " +recursos.size());
+           
         } catch (Throwable t) {
             logger.error(WTF_MARKER, t.getMessage(), t);
         } finally {
