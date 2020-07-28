@@ -62,6 +62,9 @@ public class BiblioDataGenerate {
         model.setNsPrefix("prism", prism);
         Model prismModel = ModelFactory.createDefaultModel();
         
+        String schema = "http://schema.org/";
+        model.setNsPrefix("schema", schema);
+        Model schemaModel = ModelFactory.createDefaultModel();
         
         
         String bido = "http://purl.org/spar/bido/";
@@ -105,7 +108,6 @@ public class BiblioDataGenerate {
                 Source source = new Source(atributosS[k][1], atributosS[k][2], parts_issn[l], atributosS[k][4],
                         atributosS[k][5], categorias, rank, atributosS[k][7], atributosS[k][8]);
                 String URI_SourceT = dataPrefix+"Source/" + source.getIssn();
-                
                 Resource sourceT = model.createResource(URI_SourceT)
                     .addProperty(RDF.type, myOntoModel.getResource(dataPrefix + "SourceT"))
                     .addProperty(prismModel.getProperty(prism +"issn"), source.getIssn())
@@ -113,15 +115,12 @@ public class BiblioDataGenerate {
                     .addProperty(DCTerms.title, source.getTitle())
                     .addProperty(dboModel.getProperty(dbo+"country"), dbrModel.getResource(dbr +source.getCountry().replace(" ","")))
                     .addProperty(myOntoModel.getProperty(dataPrefix +"rank"), source.getRank());
-                
                 for(int contC=0; contC<source.getCategorias().size(); contC++){
-                    
                     Resource quartile = model.createResource(dataPrefix+ source.getIssn()+"_" +source.getCategorias().get(contC).replace(" ",""))
                             .addProperty(RDF.type, bidoModel.getResource(bido + "Quartile"))
                             .addProperty(DCTerms.title, source.getCategorias().get(contC))
                             .addProperty(myOntoModel.getProperty(dataPrefix + "quartile"), source.getQuartile().get(contC))
                             .addProperty(RDFS.subClassOf, bidoModel.getResource(bido +"QuartileCategory"));
-                    
                     sourceT.addProperty(bidoModel.getProperty(bido +"hasQuartile"), quartile);
                 }
                 
@@ -194,17 +193,23 @@ public class BiblioDataGenerate {
                             .addProperty(DCTerms.publisher, fuenteDocumento)
                             .addProperty(dcatModel.getProperty(dcat +"dataset"), datasetInfo ));
 
+            
+            Resource lang = model.createResource(dbr+language)
+                    .addProperty(RDF.type, schemaModel.getResource(schema + "Language"))
+                    .addProperty(RDFS.label, language);
+            
+            
             // CREACION DE DOCUMENTO BIBLIOGRAFICO
             Resource documento = model.createResource(URI_DOCUMENTO)
                     .addProperty(DCTerms.title, titulo)
                     .addProperty(DCTerms.date, anio)
                     .addProperty(myOntoModel.getProperty(dataPrefix +"citationsCount"), num_citas)
-                    .addProperty(DCTerms.language, dboModel.getResource(dbr+language))
-                    .addProperty(RDFS.subClassOf, fabioModel.getResource(fabio+ "ScholaryWork")
+                    .addProperty(DCTerms.language, lang)
+                    .addProperty(RDFS.subClassOf, fabioModel.getResource(fabio+ "ScholaryWork"))
                     .addProperty(prismModel.getProperty(prism +"doi"), doi)
                     .addProperty(prismModel.getProperty(prism +"issn"), issn)
                     .addProperty(prismModel.getProperty(prism +"volume"), vol)
-                    .addProperty(provModel.getProperty(prov + "wasDerivedFrom"), datasetInfo))
+                    .addProperty(provModel.getProperty(prov + "wasDerivedFrom"), datasetInfo)
                     .addProperty(bidoModel.getProperty(bido+ "withBibliometricData"), myOntoModel.getResource(dataPrefix+"Source/"+issn));
             // Se crea el tipo de documento
             // Se compara el tipo con los de fabio y si es igual toma la uri de fabio
@@ -216,7 +221,6 @@ public class BiblioDataGenerate {
                     break;
                 }
             }
-            
             if(!tipo){
                 documento.addProperty(RDF.type, myOntoModel.getResource(dataPrefix + document_type.replace(" ","")));
             }
